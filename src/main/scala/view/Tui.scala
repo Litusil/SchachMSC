@@ -7,16 +7,15 @@ import util.Observer
 
 
 case class Tui(controller: ChessController) extends Observer {
-
-
+  controller.add(this)
+  print()
 
   override def update(): Unit ={
     print()
   }
 
   def print(): String ={
-    //controller.chessBoard.toString
-    ""
+    controller.chessBoard.toString
   }
 
   def processInputLine(eingabe: String): Unit ={

@@ -22,7 +22,9 @@ object Schach {
   val tuiFuture = uiFactory ? CreateTui(controller)
   val tui = Await.result(tuiFuture.mapTo[Tui], Duration.Inf)
 
-  uiFactory ! CreateGui(controller)
+  //uiFactory ! CreateGui(controller)
+
+
 
   def main(args: Array[String]) {
     var input: String = ""
