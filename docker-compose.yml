@@ -1,0 +1,9 @@
+client:
+  image: schach_client
+  stdin_open: true
+  tty: true
+  net: host
+
+server:
+  image: schach_server
+  net: host

@@ -31,7 +31,11 @@ object Schach {
 
     do {
       input = readLine()
-      tui.processInputLine(input)
+      if(input != null){
+        tui.processInputLine(Some(input))
+      } else {
+        input = ""
+      }
 
     } while (input != "q")
 

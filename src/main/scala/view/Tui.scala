@@ -18,9 +18,14 @@ case class Tui(controller: ChessController) extends Observer {
     controller.chessBoard.toString
   }
 
-  def processInputLine(eingabe: String): Unit ={
-    if (eingabe.trim().toUpperCase.matches("[a-hA-H][1-8]( |-)[a-hA-H][1-8]")){
-      var command = eingabe.trim().toUpperCase
+  def processInputLine(eingabe: Option[String]): Unit ={
+    if (eingabe.isEmpty){
+      println("falsche Eingabe!\n")
+      return
+    }
+
+    if (eingabe.get.trim().toUpperCase.matches("[a-hA-H][1-8]( |-)[a-hA-H][1-8]")){
+      var command = eingabe.get.trim().toUpperCase
       command = command.replaceAll("A","0")
       command = command.replaceAll("B","1")
       command = command.replaceAll("C","2")
