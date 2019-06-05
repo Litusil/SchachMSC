@@ -303,5 +303,32 @@ case class ChessBoard(field: Vector[Vector[Option[ChessPiece]]], currentPlayer: 
     )
   }
 
+  def fieldToJson (): JsObject = {
+    var pieces: Vector[(Int,Int,Boolean,String)] = Vector()
+
+    for (y <- field.indices) {
+      for (x <- field.indices) {
+        if (!field(y)(x).isEmpty) {
+          pieces = pieces :+ (y,x,field(y)(x).get.hasMoved,field(y)(x).get.toString)
+        }
+      }
+    }
+    Json.obj(
+      "grid" -> Json.obj(
+        "cells" -> Json.toJson(
+          for {
+            p <- pieces
+          } yield {
+            Json.obj(
+              "row" -> p._1,
+              "col" -> p._2,
+              "hasMoved" -> p._3,
+              "piece" -> p._4.toString
+            )
+          }
+        )
+      )
+    )
+  }
 
 }
