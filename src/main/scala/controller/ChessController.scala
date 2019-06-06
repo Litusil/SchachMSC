@@ -8,13 +8,14 @@ import akka.http.scaladsl.model.Uri.Query
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.ActorMaterializer
-import com.google.inject.Guice
+import com.google.inject.{Guice, Injector}
 import net.codingwell.scalaguice.InjectorExtensions._
 import model._
 import model.fileIOComponent.FileIOInterface
+import module.SchachModule
 import util.{JsonUtil, Observable}
-import scala.concurrent.duration._
 
+import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Await, Future}
 import scala.util.{Failure, Success}
@@ -27,6 +28,9 @@ class ChessController extends Observable {
   val boardSize = 8
   var chessBoard: ChessBoard = newGame()
   val json = JsonUtil()
+
+  val injector: Injector = Guice.createInjector(new SchachModule)
+  val fileIo: FileIOInterface = injector.instance[FileIOInterface]
 
   def newGame(): ChessBoard = {
     new ChessBoard(Vector.fill(boardSize,boardSize)(None: Option[ChessPiece])).defaultInit()
@@ -49,4 +53,17 @@ class ChessController extends Observable {
         case Failure(_)   => sys.error("something wrong")
       }
   }
+
+  def save(): Unit={
+    fileIo.save(chessBoard)
+
+    println("you saved the game")
+  }
+
+  def load(): Unit={
+    chessBoard = fileIo.load()
+    println("you loaded the game")
+    notifyObservers()
+  }
+
 }

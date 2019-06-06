@@ -3,15 +3,17 @@ package model.fileIOComponent.fileIOSlickImpl
 
 import com.google.inject.{Guice, Inject}
 import com.google.inject.name.{Named, Names}
+import controller.ChessController
 import model.database.ChessBoard
 import model.fileIOComponent.FileIOInterface
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 import scala.util.Try
 import slick.jdbc.H2Profile.api._
 import slick.jdbc.meta.MTable
+import util.JsonUtil
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -23,6 +25,13 @@ class FileIO @Inject()(@Named("H2Url") url: String, @Named("H2User") dbUser: Str
   val tables = List(
     TableQuery[ChessBoard]
   )
+  val chessBoardQuery = TableQuery[ChessBoard]
+
+  /*
+  db.run(DBIO.seq(
+    chessBoardQuery +=  (0, "",true, Some(true), Some(true), true)
+  ))
+  */
 
   val existingTables = db.run(MTable.getTables)
   val createSchemaFuture = existingTables.flatMap( v => {
@@ -33,76 +42,37 @@ class FileIO @Inject()(@Named("H2Url") url: String, @Named("H2User") dbUser: Str
   })
   Await.result(createSchemaFuture, Duration.Inf)
 
-  override def load: Try[Option[GridInterface]] = {
-    var gridOption: Option[GridInterface] = None
+  override def load: model.ChessBoard = {
 
-    Try {
-      val injector = Guice.createInjector(new SudokuModule)
 
-      val grids = TableQuery[Grid]
-      val cells = TableQuery[Cell]
+    val query = chessBoardQuery.map(_.*)
+    val action = query.result
+    val runresult = db.run( action)
+    val result = Await.result(runresult, Duration.Inf)
 
-      val gridQuery = for (
-        grid <- grids
-      ) yield grid
+    val field = result.head._2
+    val json = JsonUtil()
+    val chessVec = json.createFieldFromJSON(result.head._2)
+    model.ChessBoard(chessVec, result.head._3,result.head._4,result.head._5,result.head._6)
 
-      val gridF = db.run(gridQuery.result)
-      val gridRes = Await.result(gridF, Duration.Inf)
-      val gridSize = gridRes.head._2
-
-      gridSize match {
-        case 1 =>
-          gridOption =  Some(injector.instance[GridInterface](Names.named("tiny")))
-        case 4 =>
-          gridOption =
-            Some(injector.instance[GridInterface](Names.named("small")))
-        case 9 =>
-          gridOption =
-            Some(injector.instance[GridInterface](Names.named("normal")))
-        case _ =>
-      }
-
-      val cellsQuery = for (
-        cell <- cells
-      ) yield cell
-
-      val cellsF = db.run(cellsQuery.result)
-      val cellsRes = Await.result(cellsF, Duration.Inf)
-
-      gridOption match {
-        case Some(grid) => {
-          var _grid = grid
-
-          cellsRes.foreach(c => {
-            _grid = _grid.set(c._2, c._3, c._4)
-            val given = c._5
-            val showCandidates = c._6
-            if (given) _grid = _grid.setGiven(c._2, c._3, c._4)
-            if (showCandidates) _grid = _grid.setShowCandidates(c._2, c._3)
-          })
-
-          gridOption = Some(_grid)
-        }
-        case None =>
-      }
-
-      gridOption
-    }
   }
 
   override def save(chessBoard: model.ChessBoard): Unit = {
 
-    Try{
+
       val chessBoardQuery = TableQuery[ChessBoard]
 
       Await.result(db.run(chessBoardQuery.delete), Duration.Inf)
 
+    db.run(DBIO.seq(
+      chessBoardQuery += (0,chessBoard.fieldToJson().toString(), chessBoard.currentPlayer, chessBoard.check, chessBoard.checkmate, chessBoard.simulated)
+    ))
 
+    val query = chessBoardQuery.map(_.*)
+    val action = query.result
+    val results = db.run( action)
+    results.foreach( println )
 
-      db.run(DBIO.seq(
-        chessBoardQuery += (0,chessBoard.fieldToJson().toString(), chessBoard.currentPlayer, chessBoard.check, chessBoard.checkmate, chessBoard.simulated)
-      ))
-    }
   }
 
 

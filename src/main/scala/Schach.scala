@@ -6,6 +6,8 @@ import view.{Tui, UiFactory}
 import akka.actor.{ActorSystem, Props}
 import akka.pattern.ask
 import akka.util.Timeout
+import com.google.inject.{Guice, Injector}
+import module.SchachModule
 import view.UiMessage.{CreateGui, CreateTui}
 
 import scala.concurrent.Await

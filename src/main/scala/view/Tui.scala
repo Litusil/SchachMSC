@@ -24,6 +24,16 @@ case class Tui(controller: ChessController) extends Observer {
       return
     }
 
+    if (eingabe.get == "save"){
+      controller.save()
+      return
+    }
+
+    if (eingabe.get == "load"){
+      controller.load()
+      return
+    }
+
     if (eingabe.get.trim().toUpperCase.matches("[a-hA-H][1-8]( |-)[a-hA-H][1-8]")){
       var command = eingabe.get.trim().toUpperCase
       command = command.replaceAll("A","0")

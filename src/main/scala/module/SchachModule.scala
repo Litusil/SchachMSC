@@ -1,3 +1,5 @@
+package module
+
 import com.google.inject.AbstractModule
 import com.google.inject.name.Names
 import model.fileIOComponent.FileIOInterface
@@ -8,8 +10,8 @@ class SchachModule extends AbstractModule with ScalaModule {
   def configure() = {
     val config: scala.xml.Elem = scala.xml.XML.loadFile("config.xml")
     val savesystem: String = (config \\ "slmanager" \ "@type").text
-    val databaseUrl: String = "jdbc:h2:~/ChessBoard" // in memory on localhost
-    val databaseUser: String = "SA"
+    val databaseUrl: String = "jdbc:h2:mem:default;DB_CLOSE_DELAY=-1" // in memory on localhost
+    val databaseUser: String = ""
 
     if (savesystem.equals("JSON")){
       bind[FileIOInterface].to[model.fileIOComponent.fileIoJsonImpl.FileIO]

@@ -48,5 +48,25 @@ case class JsonUtil() {
 
     chessBoard
   }
+
+  def createFieldFromJSON(source: String): Vector[Vector[Option[ChessPiece]]] ={
+    val PieceFactory = new ChessPieceFactory
+    val json: JsValue = Json.parse(source)
+    var ChessVector = Vector.fill(8,8)(None: Option[ChessPiece])
+
+    val cells = (json \ "grid" \ "cells").as[List[JsObject]]
+
+    for (c <- cells){
+      val row = (c \ "row").get.toString().toInt
+      val col = (c \ "col").get.toString().toInt
+      val hasMoved = (c \ "hasMoved").get.toString().toBoolean
+      val piece = (c \ "piece").get.toString().replace("\"","").trim
+      ChessVector =  ChessVector.updated(row,ChessVector(row).updated(col,PieceFactory.create(piece,hasMoved)))
+
+    }
+
+    ChessVector
+  }
+
 }
 
