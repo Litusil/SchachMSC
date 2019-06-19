@@ -38,7 +38,7 @@ class ChessController extends Observable {
 
   def move(x_start: Int,y_start: Int,x_ziel: Int,y_ziel: Int): Unit = {
 
-    val uri = Uri(URLDecoder.decode("http://localhost:8080/move", "UTF-8"))
+    val uri = Uri(URLDecoder.decode("http://localhost:8081/move", "UTF-8"))
 
     val responseFuture: Future[HttpResponse] = Http().singleRequest(HttpRequest(method = HttpMethods.POST,uri = uri.withQuery(Query("x" -> x_start.toString,"y" -> y_start.toString,"xNew" -> x_ziel.toString ,"yNew" -> y_ziel.toString )) , entity = HttpEntity(ContentTypes.`application/json`,chessBoard.toJson().toString())))
 

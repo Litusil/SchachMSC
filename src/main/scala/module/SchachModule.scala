@@ -13,6 +13,9 @@ class SchachModule extends AbstractModule with ScalaModule {
     val databaseUrl: String = "jdbc:h2:mem:default;DB_CLOSE_DELAY=-1" // in memory on localhost
     val databaseUser: String = ""
 
+    val defaultHostname: String = "localhost"
+    val defaultMongoDBPort: Int = 27017
+
     if (savesystem.equals("JSON")){
       bind[FileIOInterface].to[model.fileIOComponent.fileIoJsonImpl.FileIO]
     } else if(savesystem.equals("XML")){
@@ -21,6 +24,10 @@ class SchachModule extends AbstractModule with ScalaModule {
       bindConstant().annotatedWith(Names.named("H2Url")).to(databaseUrl)
       bindConstant().annotatedWith(Names.named("H2User")).to(databaseUser)
       bind[FileIOInterface].to[model.fileIOComponent.fileIOSlickImpl.FileIO]
+    } else if(savesystem.equals("MONGO")){
+      bindConstant().annotatedWith(Names.named("MongoDBHost")).to(defaultHostname)
+      bindConstant().annotatedWith(Names.named("MongoDBPort")).to(defaultMongoDBPort)
+      bind[FileIOInterface].to[model.fileIOComponent.fileIOMongoImpl.FileIO]
     }
   }
 

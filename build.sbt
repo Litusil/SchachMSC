@@ -30,11 +30,14 @@ libraryDependencies += "com.typesafe.slick" %% "slick" % "3.2.3"
 
 libraryDependencies += "com.h2database" % "h2" % "1.4.192"
 
+libraryDependencies += "org.mongodb.scala" %% "mongo-scala-driver" % "2.3.0"
+
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor"                     % akkaVersion,
   "com.typesafe.akka" %% "akka-http-core"                 % akkaHttp,
   "com.typesafe.akka" %% "akka-http"                      % akkaHttp,
   "com.typesafe.akka" %% "akka-http-spray-json"           % akkaHttp,
-  "com.typesafe.play" %% "play-ws-standalone-json"        % "1.1.8"),
-  
+  "com.typesafe.play" %% "play-ws-standalone-json"        % "1.1.8")
+
+
 
